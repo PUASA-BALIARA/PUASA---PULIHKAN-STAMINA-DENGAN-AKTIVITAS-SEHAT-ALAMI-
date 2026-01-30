@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUASA - Pulihkan Stamina</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .dynamic-bg {
+            background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 50%, #ffffff 100%);
+            min-height: 100vh;
+        }
+
+        .blob {
+            position: fixed;
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: move 20s infinite alternate;
+        }
+
+        @keyframes move {
+            from { transform: translate(0, 0) rotate(0deg); }
+            to { transform: translate(20vw, 20vh) rotate(360deg); }
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #splash {
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+
+        /* Styling Bintang Kuning yang diperkuat */
+        .star-active {
+            fill: #facc15 !important;
+            stroke: #facc15 !important;
+            color: #facc15 !important;
+        }
+
+        .star-btn svg {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Badge Animation */
+        @keyframes badgePop {
+            0% { transform: scale(0.5) rotate(-20deg); opacity: 0; }
+            70% { transform: scale(1.1) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .badge-animation {
+            animation: badgePop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .glow-effect {
+            box-shadow: 0 0 40px rgba(234, 179, 8, 0.4);
+        }
+    </style>
+</head>
+<body class="dynamic-bg text-slate-800">
+
+    <!-- Background Animasi -->
+    <div class="blob w-80 h-80 bg-blue-300 rounded-full top-10 -left-20"></div>
+    <div class="blob w-96 h-96 bg-lime-200 rounded-full bottom-20 -right-20" style="animation-delay: -5s;"></div>
+
+    <!-- Opening Animation / Splash -->
+    <div id="splash" class="fixed inset-0 bg-blue-600 z-[100] flex flex-col items-center justify-center text-white text-center p-6">
+        <div class="animate-bounce mb-6">
+            <i data-lucide="activity" class="w-20 h-20"></i>
+        </div>
+        <h1 class="text-5xl font-extrabold tracking-tighter mb-2">PUASA</h1>
+        <p class="text-blue-100 font-medium">Pulihkan Stamina dengan Aktivitas Sehat Alami</p>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="max-w-md mx-auto px-6 pt-12 pb-32">
+        
+        <!-- Tab: HOME -->
+        <section id="home" class="tab-content active space-y-8">
+            <header class="text-center">
+                <span class="inline-block bg-white/40 px-4 py-1 rounded-full text-blue-700 text-xs font-bold tracking-widest mb-2 uppercase">Program KKN 2026</span>
+                <h1 class="text-6xl font-black text-white drop-shadow-md italic leading-tight">PUASA</h1>
+                <p class="text-blue-900 font-bold text-lg leading-snug px-4">Pulihkan Stamina dengan Aktivitas Sehat Alami</p>
+            </header>
+
+            <!-- Infografis Singkat -->
+            <div class="bg-white/40 backdrop-blur-lg rounded-[2.5rem] p-6 border border-white/50 shadow-xl relative overflow-hidden group">
+                <i data-lucide="bar-chart-3" class="absolute -right-4 -top-4 w-24 h-24 text-blue-900 opacity-5 group-hover:scale-110 transition-transform"></i>
+                <h3 class="text-xs font-black text-blue-900 uppercase tracking-widest mb-4">Data Kesehatan Indonesia</h3>
+                <div class="flex items-center gap-5">
+                    <div class="bg-blue-600 text-white p-4 rounded-2xl shadow-lg">
+                        <span class="text-3xl font-black">70%</span>
+                    </div>
+                    <p class="text-sm font-semibold text-blue-950 leading-tight">
+                        Penyakit tidak menular dapat dicegah hanya dengan 15 menit aktivitas fisik harian.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Aktivitas Grid -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-black text-blue-950 flex items-center gap-2">
+                    <i data-lucide="play-circle" class="w-6 h-6"></i> Pilih Aktivitas
+                </h3>
+                <div id="activity-list" class="space-y-4">
+                    <!-- Dinamis via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: PROGRESS -->
+        <section id="progress" class="tab-content space-y-8">
+            <h2 class="text-3xl font-black text-blue-950">Progres Kamu</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-6 rounded-3xl shadow-xl text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Sesi</p>
+                    <span id="stat-sessions" class="text-5xl font-black text-blue-600">0</span>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-xl text-center flex flex-col items-center justify-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Level</p>
+                    <span id="stat-level" class="text-lg font-black text-lime-600 leading-tight">Pemula</span>
+                    <i data-lucide="award" class="w-5 h-5 text-lime-500 mt-1"></i>
+                </div>
+            </div>
+            <div class="bg-white/30 backdrop-blur-md rounded-3xl p-6 border border-white/50">
+                <h4 class="font-bold text-blue-900 mb-4 flex items-center gap-2">
+                    <i data-lucide="history" class="w-5 h-5"></i> Aktivitas Selesai
+                </h4>
+                <div id="history-list" class="space-y-2">
+                    <!-- Dinamis via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab: CHALLENGE -->
+        <section id="challenge" class="tab-content space-y-8">
+            <h2 class="text-3xl font-black text-blue-950">Tantangan Hari Ini</h2>
+            <div class="bg-gradient-to-br from-orange-400 to-orange-600 p-8 rounded-[3rem] shadow-2xl text-white relative overflow-hidden">
+                <i data-lucide="zap" class="absolute -bottom-6 -right-6 w-32 h-32 opacity-20 rotate-12"></i>
+                <span class="bg-white/20 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 inline-block">Misi Aktif</span>
+                <h3 class="text-2xl font-black mb-2">Jalan Kaki 1.000 Langkah</h3>
+                <p class="text-orange-100 font-medium mb-6">Segarkan paru-paru dan otot kakimu dengan berjalan santai di lingkungan rumah.</p>
+                <button onclick="window.showMissionBadge()" class="w-full bg-white text-orange-600 font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider">Selesai!</button>
+            </div>
+        </section>
+
+        <!-- Tab: MOTIVASI -->
+        <section id="motivation" class="tab-content space-y-8">
+            <h2 class="text-3xl font-black text-blue-950">Inspirasi Sehat</h2>
+            <div class="space-y-8">
+                <div class="bg-white p-8 rounded-[2.5rem] shadow-xl relative mt-8">
+                    <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=100" class="absolute -top-8 left-8 w-16 h-16 rounded-2xl border-4 border-white shadow-lg rotate-3 object-cover">
+                    <div class="pt-6">
+                        <i data-lucide="quote" class="text-blue-100 w-12 h-12 mb-2"></i>
+                        <p class="text-lg font-bold italic text-slate-700 leading-relaxed mb-4">"Kesehatan adalah investasi terbaik untuk masa tua yang bahagia."</p>
+                        <div class="border-t pt-4">
+                            <p class="font-black text-blue-600 uppercase text-sm">Dr. Andi Sehat</p>
+                            <p class="text-xs text-slate-400 font-bold">Praktisi Kesehatan</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-xl border border-white/50 px-8 py-4 rounded-full shadow-2xl z-50 flex gap-10 items-center">
+        <button onclick="window.switchTab('home')" class="nav-btn flex flex-col items-center gap-1 text-blue-600" data-tab="home">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Utama</span>
+        </button>
+        <button onclick="window.switchTab('progress')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" data-tab="progress">
+            <i data-lucide="line-chart" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Progres</span>
+        </button>
+        <button onclick="window.switchTab('challenge')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" data-tab="challenge">
+            <i data-lucide="zap" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Misi</span>
+        </button>
+        <button onclick="window.switchTab('motivation')" class="nav-btn flex flex-col items-center gap-1 text-slate-400" data-tab="motivation">
+            <i data-lucide="heart" class="w-5 h-5"></i>
+            <span class="text-[9px] font-bold uppercase tracking-tighter">Motivasi</span>
+        </button>
+    </nav>
+
+    <!-- Modal Rating -->
+    <div id="modal-rating" class="fixed inset-0 bg-blue-900/40 backdrop-blur-md z-[200] hidden items-center justify-center p-6">
+        <div class="bg-white w-full max-w-sm rounded-[3rem] p-8 shadow-2xl text-center space-y-6">
+            <div class="bg-yellow-50 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto text-yellow-500">
+                <i data-lucide="star" class="w-10 h-10 fill-yellow-400"></i>
+            </div>
+            <div>
+                <h3 class="text-2xl font-black text-slate-800">Sesi Selesai!</h3>
+                <p id="rating-title" class="text-slate-500 font-medium mt-1">Beri rating untuk sesi ini</p>
+            </div>
+            <div class="flex justify-center gap-2" id="star-container">
+                <!-- Stars dinamis -->
+                <button onclick="window.setRating(1)" class="star-btn"><i data-lucide="star" class="w-8 h-8 text-slate-200"></i></button>
+                <button onclick="window.setRating(2)" class="star-btn"><i data-lucide="star" class="w-8 h-8 text-slate-200"></i></button>
+                <button onclick="window.setRating(3)" class="star-btn"><i data-lucide="star" class="w-8 h-8 text-slate-200"></i></button>
+                <button onclick="window.setRating(4)" class="star-btn"><i data-lucide="star" class="w-8 h-8 text-slate-200"></i></button>
+                <button onclick="window.setRating(5)" class="star-btn"><i data-lucide="star" class="w-8 h-8 text-slate-200"></i></button>
+            </div>
+            <button onclick="window.submitRating()" class="w-full bg-blue-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all disabled:opacity-50" id="btn-submit-rating" disabled>KIRIM PENILAIAN</button>
+        </div>
+    </div>
+
+    <!-- Modal Lencana Kebanggaan -->
+    <div id="modal-badge" class="fixed inset-0 bg-blue-950/70 backdrop-blur-xl z-[300] hidden items-center justify-center p-6">
+        <div class="bg-white w-full max-w-sm rounded-[3.5rem] p-10 shadow-2xl text-center space-y-8 relative overflow-hidden badge-animation">
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-400/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl"></div>
+            
+            <div class="relative inline-block">
+                <div class="w-28 h-28 bg-gradient-to-tr from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center mx-auto shadow-2xl glow-effect">
+                    <i data-lucide="trophy" class="w-14 h-14 text-white"></i>
+                </div>
+                <div class="absolute -top-2 -right-2 bg-lime-500 text-white p-2 rounded-full shadow-lg">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <h3 class="text-3xl font-black text-slate-800 leading-tight">Pahlawan Sehat!</h3>
+                <p class="text-slate-500 font-semibold px-4">Kamu baru saja mendapatkan lencana <span class="text-yellow-600">Pejuang Stamina</span>.</p>
+            </div>
+
+            <div class="bg-blue-50 py-4 px-6 rounded-3xl border border-blue-100">
+                <p class="text-[10px] font-black uppercase tracking-widest text-blue-400 mb-1">Misi Berhasil</p>
+                <p class="text-sm font-bold text-blue-700 leading-snug">Jalan Kaki 1.000 Langkah Selesai!</p>
+            </div>
+
+            <button onclick="window.closeBadge()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl active:scale-95 transition-all">HEBAT, LANJUTKAN!</button>
+        </div>
+    </div>
+
+    <!-- Pop-up Apresiasi -->
+    <div id="toast" class="fixed top-10 left-6 right-6 z-[300] hidden transition-all">
+        <div class="bg-white border-2 border-lime-500 p-6 rounded-[2rem] shadow-2xl flex items-center gap-4">
+            <div class="bg-lime-500 text-white p-2 rounded-xl"><i data-lucide="check-circle-2"></i></div>
+            <p id="toast-message" class="font-bold text-slate-800 leading-tight"></p>
+        </div>
+    </div>
+
+    <footer class="max-w-md mx-auto px-6 py-12 text-center space-y-4 border-t border-blue-100 mt-10 text-slate-400">
+        <a href="https://www.instagram.com/kkn.desabaliara2026?igsh=MWJsMmw0YTNmejByOA==" class="inline-flex items-center gap-2 bg-gradient-to-tr from-purple-500 to-pink-500 text-white px-6 py-2 rounded-full font-bold shadow-lg">
+            <i data-lucide="instagram" class="w-4 h-4"></i> @kkn_desabaliara2026
+        </a>
+        <p class="text-[10px] font-bold uppercase tracking-[0.2em]">© Fakrida – All Rights Reserved 2026</p>
+    </footer>
+
+    <!-- Scripts: Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const getFirebaseConfig = () => {
+            try {
+                if (window.__firebase_config) return JSON.parse(window.__firebase_config);
+            } catch (e) { console.warn("Firebase config not found, using offline mode."); }
+            return null;
+        };
+
+        const firebaseConfig = getFirebaseConfig();
+        const appId = window.__app_id || 'kkn-puasa-001';
+        let db = null;
+        let auth = null;
+
+        if (firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        }
+
+        let currentUser = null;
+        let userData = { watched: [], sessions: 0, ratings: {} };
+        let activeRatingItem = null;
+        let selectedRatingValue = 0;
+
+        const activities = [
+            { id: 'stretch', title: 'Peregangan Pelan', color: 'bg-blue-500', icon: 'wind', url: 'https://youtu.be/pi5WhX24uS4?si=DwK7hPeVWhGZrGPu' },
+            { id: 'air', title: 'Udara Segar & Gerak', color: 'bg-cyan-400', icon: 'cloud-sun', url: 'https://youtu.be/ZxZyJkGarXg?si=6AotNLMVE4sRNvXv' },
+            { id: 'muscle', title: 'Aktifkan Otot Lembut', color: 'bg-lime-500', icon: 'zap', url: 'https://youtu.be/LrNhnsWPtgQ?si=_e_SH2meB0QPBUMV' },
+            { id: 'stability', title: 'Stabilitas Posisi', color: 'bg-orange-500', icon: 'shield-check', url: 'https://youtu.be/ZLxyh_PEstI?si=h_KvXP-XT2cgI_4V' },
+            { id: 'relax', title: 'Akhiran Relaksasi', color: 'bg-indigo-500', icon: 'moon', url: 'https://youtu.be/xmcDj4Bf--0?si=eDulPu29bPl2UNNs' }
+        ];
+
+        // Fungsi pemicu rating (dipanggil saat link diklik)
+        window.triggerRating = (id) => {
+            const act = activities.find(a => a.id === id);
+            if (!act) return;
+
+            // Beri jeda singkat agar tab baru terbuka dulu, lalu tampilkan modal penilaian
+            setTimeout(() => {
+                activeRatingItem = act;
+                const ratingTitle = document.getElementById('rating-title');
+                if(ratingTitle) ratingTitle.innerText = act.title;
+                
+                const modal = document.getElementById('modal-rating');
+                if(modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+                
+                selectedRatingValue = 0;
+                window.resetStars();
+            }, 2000); 
+        };
+
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            const activeTab = document.getElementById(tabId);
+            if(activeTab) activeTab.classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-blue-600');
+                btn.classList.add('text-slate-400');
+                if (btn.dataset.tab === tabId) btn.classList.add('text-blue-600');
+            });
+        };
+
+        window.setRating = (val) => {
+            selectedRatingValue = val;
+            const buttons = document.querySelectorAll('.star-btn');
+            buttons.forEach((btn, i) => {
+                const icon = btn.querySelector('svg') || btn.querySelector('i');
+                if (!icon) return;
+                if (i < val) {
+                    icon.classList.add('star-active');
+                    icon.style.fill = '#facc15';
+                    icon.style.stroke = '#facc15';
+                    icon.style.color = '#facc15';
+                } else {
+                    icon.classList.remove('star-active');
+                    icon.style.fill = 'none';
+                    icon.style.stroke = '#e2e8f0';
+                    icon.style.color = '#e2e8f0';
+                }
+            });
+            const submitBtn = document.getElementById('btn-submit-rating');
+            if(submitBtn) submitBtn.disabled = false;
+        };
+
+        window.resetStars = () => {
+            const buttons = document.querySelectorAll('.star-btn');
+            buttons.forEach(btn => {
+                const icon = btn.querySelector('svg') || btn.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('star-active');
+                    icon.style.fill = 'none';
+                    icon.style.stroke = '#e2e8f0';
+                    icon.style.color = '#e2e8f0';
+                }
+            });
+            const submitBtn = document.getElementById('btn-submit-rating');
+            if(submitBtn) submitBtn.disabled = true;
+        }
+
+        window.submitRating = async () => {
+            if (!activeRatingItem || selectedRatingValue === 0) return;
+
+            const newWatched = [...new Set([...userData.watched, activeRatingItem.id])];
+            const newRatings = { ...userData.ratings, [activeRatingItem.id]: selectedRatingValue };
+            const newSessions = userData.sessions + 1;
+
+            userData = { watched: newWatched, ratings: newRatings, sessions: newSessions };
+
+            if (db && currentUser) {
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'progress', 'current');
+                await setDoc(docRef, userData);
+            }
+
+            updateUI();
+            renderActivities();
+
+            const modal = document.getElementById('modal-rating');
+            if(modal) modal.classList.replace('flex', 'hidden');
+
+            let msg = selectedRatingValue <= 2 ? "Terima kasih masukannya!" : (selectedRatingValue <= 4 ? "Bagus sekali!" : "LUAR BIASA!");
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            if(toast && toastMsg) {
+                toastMsg.innerText = msg;
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 4000);
+            }
+        };
+
+        window.showMissionBadge = () => {
+            const modal = document.getElementById('modal-badge');
+            if(modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                lucide.createIcons();
+            }
+        };
+
+        window.closeBadge = () => {
+            const modal = document.getElementById('modal-badge');
+            if(modal) modal.classList.replace('flex', 'hidden');
+        };
+
+        async function init() {
+            lucide.createIcons();
+            setTimeout(() => {
+                const splash = document.getElementById('splash');
+                if(splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.style.visibility = 'hidden', 800);
+                }
+            }, 2000);
+
+            if (auth) {
+                signInAnonymously(auth).then(() => {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            currentUser = user;
+                            syncData();
+                        }
+                    });
+                });
+            }
+            renderActivities();
+            updateUI(); 
+        }
+
+        async function syncData() {
+            if (!currentUser || !db) return;
+            const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'progress', 'current');
+            onSnapshot(docRef, (snap) => {
+                if (snap.exists()) {
+                    userData = snap.data();
+                    updateUI();
+                    renderActivities();
+                }
+            });
+        }
+
+        function renderActivities() {
+            const list = document.getElementById('activity-list');
+            if(!list) return;
+            // Diperbarui: Menggunakan tag <a> sebagai wrapper utama agar browser tidak memblokir link sebagai pop-up
+            list.innerHTML = activities.map(act => `
+                <a href="${act.url}" target="_blank" onclick="window.triggerRating('${act.id}')" rel="noopener noreferrer" class="group relative flex items-center gap-4 bg-white p-4 rounded-[2rem] shadow-lg shadow-blue-200 border-2 border-transparent hover:border-blue-400 hover:scale-[1.02] active:scale-95 transition-all w-full text-left">
+                    <div class="${act.color} text-white p-4 rounded-2xl shadow-inner group-hover:rotate-12 transition-transform">
+                        <i data-lucide="${act.icon}"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-800">${act.title}</h4>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Klik untuk Menonton</p>
+                    </div>
+                    <div class="text-blue-100 group-hover:text-blue-500 transition-colors">
+                        <i data-lucide="play" class="fill-current"></i>
+                    </div>
+                    <div id="check-${act.id}" class="${userData.watched.includes(act.id) ? '' : 'hidden'} absolute top-2 right-6 text-lime-500">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    </div>
+                </a>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function updateUI() {
+            const sessionsEl = document.getElementById('stat-sessions');
+            const levelEl = document.getElementById('stat-level');
+            if(sessionsEl) sessionsEl.innerText = userData.sessions;
+            let level = userData.sessions >= 15 ? "Healthy Champion" : (userData.sessions >= 10 ? "Konsisten" : (userData.sessions >= 5 ? "Aktif" : "Pemula"));
+            if(levelEl) levelEl.innerText = level;
+            const historyList = document.getElementById('history-list');
+            if(historyList) {
+                historyList.innerHTML = activities.map(act => {
+                    if (!userData.watched.includes(act.id)) return '';
+                    const stars = '★'.repeat(userData.ratings[act.id] || 0) + '☆'.repeat(5 - (userData.ratings[act.id] || 0));
+                    return `<div class="flex items-center justify-between bg-white/60 p-3 rounded-2xl">
+                        <span class="text-sm font-bold text-slate-700">${act.title}</span>
+                        <span class="text-yellow-500 text-xs font-bold tracking-widest">${stars}</span>
+                    </div>`;
+                }).join('') || '<p class="text-xs text-slate-400 text-center py-4">Belum ada aktivitas selesai</p>';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
